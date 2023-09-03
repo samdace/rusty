@@ -26,7 +26,7 @@ jobs:
       - name: Run cargo 
         uses: actions-rs/cargo@v1
         with:
-          command: run --verbose
+          command: run
 
  
  
