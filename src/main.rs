@@ -1,5 +1,5 @@
 
-use surrealdb::{Surreal, engine::local::RocksDb, opt::auth::Root };
+use surrealdb::{Surreal, engine::local::File, opt::auth::Root };
 use serde::{Serialize , Deserialize};
 use surrealdb::opt::{Config};
 use surrealdb::dbs::Capabilities;
@@ -17,10 +17,15 @@ struct User {
 
 #[tokio::main]
 async fn main() -> surrealdb::Result<()> {
-    let config = Config::new()
-    .capabilities(Capabilities::all())
-    .user(Root{username : "root" , password : "root"});
-    let db = Surreal::new::<RocksDb>(("data.db" , config)).await?;
+    let path = format!("/tmp/{}.db", "data");
+	let root = Root {
+				username: "root",
+				password: "root",
+			};
+	let config = Config::new()
+				.user(root)
+				.capabilities(Capabilities::all());
+	let db = Surreal::new::<File>((path, config)).await.unwrap();
     db.use_ns("test").use_db("test").await?;
     let _usercreated  : Vec<User> = db.create("user").content(User{username : "houssem".to_string()}).await?;
     let user : Vec<User> = db.select("user").await?;
